@@ -329,3 +329,149 @@ mod reverse_tests {
         assert_eq!(result, vec![42]);
     }
 }
+
+/// Concatenates two arrays into a single vector.
+///
+/// Works for integers, floating-point numbers, and complex numbers.
+///
+/// # Arguments
+/// * `arr1` - First input array.
+/// * `arr2` - Second input array.
+///
+/// # Returns
+/// * `Vec<T>` - A new vector containing elements from both arrays.
+///
+/// # Examples
+/// ```
+/// use num_complex::Complex;
+/// use rusp::misc::utils::concatenate;
+///
+/// let result = concatenate(&[1, 2], &[3, 4]);
+/// assert_eq!(result, vec![1, 2, 3, 4]);
+///
+/// let result = concatenate(&[1.5, 2.5], &[3.5, 4.5]);
+/// assert_eq!(result, vec![1.5, 2.5, 3.5, 4.5]);
+///
+/// let result = concatenate(
+///     &[Complex::new(1.0, 2.0), Complex::new(3.0, 4.0)],
+///     &[Complex::new(5.0, 6.0)]
+/// );
+/// assert_eq!(result, vec![
+///     Complex::new(1.0, 2.0),
+///     Complex::new(3.0, 4.0),
+///     Complex::new(5.0, 6.0)
+/// ]);
+/// ```
+pub fn concatenate<T>(arr1: &[T], arr2: &[T]) -> Vec<T>
+where
+    T: Num + Copy,
+{
+    let mut out = Vec::with_capacity(arr1.len() + arr2.len());
+    out.extend_from_slice(arr1);
+    out.extend_from_slice(arr2);
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::concatenate;
+    use num_complex::Complex;
+
+    #[test]
+    fn test_concatenate_integers() {
+        let result = concatenate(&[1, 2, 3], &[4, 5, 6]);
+        assert_eq!(result, vec![1, 2, 3, 4, 5, 6]);
+    }
+
+    #[test]
+    fn test_concatenate_floats() {
+        let result = concatenate(&[1.1, 2.2], &[3.3, 4.4]);
+        assert_eq!(result, vec![1.1, 2.2, 3.3, 4.4]);
+    }
+
+    #[test]
+    fn test_concatenate_complex() {
+        let result = concatenate(
+            &[Complex::new(1.0, 2.0), Complex::new(3.0, 4.0)],
+            &[Complex::new(5.0, 6.0)],
+        );
+        assert_eq!(
+            result,
+            vec![
+                Complex::new(1.0, 2.0),
+                Complex::new(3.0, 4.0),
+                Complex::new(5.0, 6.0)
+            ]
+        );
+    }
+
+    #[test]
+    fn test_concatenate_empty() {
+        let result: Vec<i32> = concatenate(&[], &[1, 2, 3]);
+        assert_eq!(result, vec![1, 2, 3]);
+
+        let result: Vec<f64> = concatenate(&[1.5, 2.5], &[]);
+        assert_eq!(result, vec![1.5, 2.5]);
+    }
+
+    #[test]
+    fn test_concatenate_int_and_float() {
+        let int_part = vec![1, 2, 3];
+        let float_part = vec![4.5, 5.5, 6.5];
+
+        let result: Vec<f64> = concatenate(
+            &int_part.iter().map(|&x| x as f64).collect::<Vec<f64>>(),
+            &float_part,
+        );
+
+        assert_eq!(result, vec![1.0, 2.0, 3.0, 4.5, 5.5, 6.5]);
+    }
+
+    #[test]
+    fn test_concatenate_int_and_complex() {
+        let int_part = vec![1, 2, 3];
+        let complex_part = vec![Complex::new(1, 2)];
+
+        let result: Vec<Complex<i32>> = concatenate(
+            &int_part
+                .iter()
+                .map(|&x| Complex::new(x as i32, 0))
+                .collect::<Vec<Complex<i32>>>(),
+            &complex_part,
+        );
+
+        assert_eq!(
+            result,
+            vec![
+                Complex::new(1, 0),
+                Complex::new(2, 0),
+                Complex::new(3, 0),
+                Complex::new(1, 2)
+            ]
+        );
+    }
+
+    #[test]
+    fn test_concatenate_float_and_complex() {
+        let float_part = vec![1.0, 2.0, 3.0];
+        let complex_part = vec![Complex::new(1.0, 2.0)];
+
+        let result: Vec<Complex<f64>> = concatenate(
+            &float_part
+                .iter()
+                .map(|&x| Complex::new(x, 0.0))
+                .collect::<Vec<Complex<f64>>>(),
+            &complex_part,
+        );
+
+        assert_eq!(
+            result,
+            vec![
+                Complex::new(1.0, 0.0),
+                Complex::new(2.0, 0.0),
+                Complex::new(3.0, 0.0),
+                Complex::new(1.0, 2.0)
+            ]
+        );
+    }
+}
