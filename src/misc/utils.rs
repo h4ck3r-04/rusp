@@ -181,3 +181,68 @@ mod linspace_repeated_tests {
         assert!(result.is_empty());
     }
 }
+
+/// Generates a sequence of evenly spaced numbers over a specified interval with a fixed step.
+///
+/// This is equivalent to the NumPy [`arange()`](https://numpy.org/doc/stable/reference/generated/numpy.arange.html) function.
+///
+/// # Arguments
+/// * `start` - Start value of the sequence.
+/// * `stop` - Stop value of the sequence.
+/// * `step` - Spacing between elements (must be nonzero).
+///
+/// # Returns
+/// * `Vec<i32> containing the evenly spaced values.`
+///
+/// # Panics
+/// Panics if `step == 0` to prevent infinite loops.
+///
+/// # Examples
+/// ```
+/// use rusp::misc::utils::arange;
+/// let result = arange(0,10,2);
+/// assert_eq!(result, vec![0,2,4,6,8])
+/// ```
+pub fn arange(start: i32, stop: i32, step: i32) -> Vec<i32> {
+    assert!(step != 0, "Step size cannot be zero");
+
+    let mut values = Vec::new();
+    let mut current = start;
+
+    if step > 0 {
+        while current < stop {
+            values.push(current);
+            current += step;
+        }
+    } else {
+        while current > stop {
+            values.push(current);
+            current += step;
+        }
+    }
+
+    values
+}
+
+#[cfg(test)]
+mod arange_tests {
+    use super::arange;
+
+    #[test]
+    fn test_arange_positive_step() {
+        let result = arange(0, 10, 2);
+        assert_eq!(result, vec![0, 2, 4, 6, 8]);
+    }
+
+    #[test]
+    fn test_arange_negative_step() {
+        let result = arange(10, 0, -2);
+        assert_eq!(result, vec![10, 8, 6, 4, 2]);
+    }
+
+    #[test]
+    #[should_panic(expected = "Step size cannot be zero")]
+    fn test_arange_zero_step() {
+        arange(0, 10, 0);
+    }
+}
