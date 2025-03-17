@@ -1,4 +1,5 @@
 use num_traits::{Num, NumCast, ToPrimitive};
+use std::ops::Neg;
 
 /// Generates a vector of evenly spaced numbers over a specified interval.
 ///
@@ -473,5 +474,40 @@ mod concatenate_tests {
                 Complex::new(1.0, 2.0)
             ]
         );
+    }
+}
+
+/// This function returns the reversal of the input matrix.
+///
+/// # Arguments
+/// * `mat` - A reference to a 2D vector representing the matrix.
+///
+/// # Returns
+/// & A 2D vector where each row is reversed.
+pub fn reverse_matrix<T>(mat: &[Vec<T>]) -> Vec<Vec<T>>
+where
+    T: Num + Copy + Neg<Output = T>,
+{
+    mat.iter()
+        .map(|row| row.iter().cloned().rev().collect())
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::reverse_matrix;
+
+    #[test]
+    fn test_reverse_matrix_int() {
+        let mat = vec![vec![1, 2, 3], vec![4, 5, 6]];
+        let expected = vec![vec![3, 2, 1], vec![6, 5, 4]];
+        assert_eq!(reverse_matrix(&mat), expected);
+    }
+
+    #[test]
+    fn test_reverse_matrix_float() {
+        let mat = vec![vec![1.1, 2.2, 3.3], vec![4.4, 5.5, 6.6]];
+        let expected = vec![vec![3.3, 2.2, 1.1], vec![6.6, 5.5, 4.4]];
+        assert_eq!(reverse_matrix(&mat), expected);
     }
 }
