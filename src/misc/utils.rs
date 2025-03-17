@@ -246,3 +246,64 @@ mod arange_tests {
         arange(0, 10, 0);
     }
 }
+
+/// Reverses the order of elements in an array.
+///
+/// # Arguments
+/// * `arr` - An array of elements (supports `i32`, `i64`, `f32`, `f64`).
+///
+/// # Returns
+/// * `Vec<T>` - A new vector with elements in reverse order.
+///
+/// # Examples
+/// ```
+/// use rusp::misc::utils::reverse;
+/// let result = reverse(&[1, 2, 3, 4]);
+/// assert_eq!(result, vec![4, 3, 2, 1]);
+///
+/// let result = reverse(&[1.5, 2.5, 3.5]);
+/// assert_eq!(result, vec![3.5, 2.5, 1.5]);
+/// ```
+pub fn reverse<T>(arr: &[T]) -> Vec<T>
+where
+    T: NumCast + Copy + PartialOrd + ToPrimitive,
+{
+    let mut reversed = arr.to_vec();
+    reversed.reverse();
+    reversed
+}
+
+#[cfg(test)]
+mod reverse_tests {
+    use super::reverse;
+
+    #[test]
+    fn test_reverse_int() {
+        let result = reverse(&[1, 2, 3, 4]);
+        assert_eq!(result, vec![4, 3, 2, 1]);
+    }
+
+    #[test]
+    fn test_reverse_float() {
+        let result = reverse(&[1.5, 2.5, 3.5]);
+        assert_eq!(result, vec![3.5, 2.5, 1.5]);
+    }
+
+    #[test]
+    fn test_reverse_unsorted_array() {
+        let result = reverse(&[1, 4, 3]);
+        assert_eq!(result, vec![3, 4, 1]);
+    }
+
+    #[test]
+    fn test_reverse_empty() {
+        let result: Vec<i32> = reverse(&[]);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_reverse_single_element() {
+        let result = reverse(&[42]);
+        assert_eq!(result, vec![42]);
+    }
+}
