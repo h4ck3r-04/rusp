@@ -1,3 +1,4 @@
+use nalgebra::{DMatrix, SVD};
 use num_traits::{Num, NumCast, ToPrimitive};
 use std::ops::Neg;
 
@@ -494,7 +495,7 @@ where
 }
 
 #[cfg(test)]
-mod tests {
+mod reverse_matrix_tests {
     use super::reverse_matrix;
 
     #[test]
@@ -509,5 +510,92 @@ mod tests {
         let mat = vec![vec![1.1, 2.2, 3.3], vec![4.4, 5.5, 6.6]];
         let expected = vec![vec![3.3, 2.2, 1.1], vec![6.6, 5.5, 4.4]];
         assert_eq!(reverse_matrix(&mat), expected);
+    }
+}
+
+/// This function returns a subset of an array based on the provided start and end indices.
+///
+/// # Arguments
+/// * `arr` - A reference to a slice of elements.
+/// * `start` - The start index (inclusive).
+/// * `end` - The end index (exclusive).
+///
+/// # Returns
+/// A vector containing the sub-array from `start` to `end`.
+pub fn split_by_index<T>(arr: &[T], start: usize, end: usize) -> Vec<T>
+where
+    T: Num + Copy + NumCast,
+{
+    if start >= end || end > arr.len() {
+        panic!("Invalid index range: start must be less than end and within bounds.")
+    }
+    arr[start..end].to_vec()
+}
+
+#[cfg(test)]
+mod split_by_index_tests {
+    use super::split_by_index;
+    use num_complex::Complex;
+
+    #[test]
+    fn test_split_by_index_int() {
+        let arr = vec![1, 2, 3, 4, 5];
+        let result = split_by_index(&arr, 1, 4);
+        assert_eq!(result, vec![2, 3, 4]);
+    }
+
+    #[test]
+    fn test_split_by_index_float() {
+        let arr = vec![1.1, 2.2, 3.3, 4.4, 5.5];
+        let result = split_by_index(&arr, 2, 5);
+        assert_eq!(result, vec![3.3, 4.4, 5.5]);
+    }
+
+    #[test]
+    fn test_split_by_index_complex() {
+        let arr = vec![
+            Complex::new(1.0, 2.0),
+            Complex::new(3.0, 4.0),
+            Complex::new(5.0, 6.0),
+        ];
+        let result = split_by_index(&arr, 1, 3);
+        assert_eq!(result, vec![Complex::new(3.0, 4.0), Complex::new(5.0, 6.0)]);
+    }
+}
+
+/// Computes the pseudo-inverse of a 2D matrix using Singular Value Decomposition (SVD).
+///
+/// # Arguments
+/// * `matrix` - A reference to a 2D vector representing the matrix.
+///
+/// # Returns
+/// A 2D vector representing the pseudo-inverse of the input matrix.
+pub fn pseudo_inverse(matrix: &[Vec<f64>]) -> Vec<Vec<f64>> {
+    let rows = matrix.len();
+    let cols = matrix[0].len();
+
+    let flat_data: Vec<f64> = matrix.iter().flat_map(|row| row.iter().copied()).collect();
+    let mat = DMatrix::from_row_slice(rows, cols, &flat_data);
+
+    let svd = SVD::new(mat.clone(), true, true);
+    let pseudo_inv = svd.pseudo_inverse(1e-10).expect("SVD failed");
+
+    pseudo_inv
+        .row_iter()
+        .map(|row| row.iter().copied().collect())
+        .collect()
+}
+
+#[cfg(test)]
+mod pseudo_inverse_tests {
+    use super::*;
+
+    #[test]
+    fn test_pseudo_inverse() {
+        let matrix = vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]];
+        let pseudo_inv = pseudo_inverse(&matrix);
+
+        assert_eq!(pseudo_inv.len(), 3);
+        assert_eq!(pseudo_inv[0].len(), 2);
     }
 }

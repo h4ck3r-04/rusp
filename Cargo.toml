@@ -9,3 +9,4 @@ authors = ["Rudraditya Thakur"]
 [dependencies]
 num-traits = "0.2.19"
 num-complex = "0.4.6"
+nalgebra = "0.33.2"
