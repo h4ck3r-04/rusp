@@ -1,4 +1,4 @@
-use num_traits::{NumCast, ToPrimitive};
+use num_traits::{Num, NumCast, ToPrimitive};
 
 /// Generates a vector of evenly spaced numbers over a specified interval.
 ///
@@ -257,16 +257,20 @@ mod arange_tests {
 ///
 /// # Examples
 /// ```
+/// use num_complex::Complex;
 /// use rusp::misc::utils::reverse;
 /// let result = reverse(&[1, 2, 3, 4]);
 /// assert_eq!(result, vec![4, 3, 2, 1]);
 ///
 /// let result = reverse(&[1.5, 2.5, 3.5]);
 /// assert_eq!(result, vec![3.5, 2.5, 1.5]);
+///
+/// let result = reverse(&[Complex::new(1.0, 2.0), Complex::new(3.0, 4.0)]);
+/// assert_eq!(result, vec![Complex::new(3.0, 4.0), Complex::new(1.0, 2.0)]);
 /// ```
 pub fn reverse<T>(arr: &[T]) -> Vec<T>
 where
-    T: NumCast + Copy + PartialOrd + ToPrimitive,
+    T: Num + Copy,
 {
     let mut reversed = arr.to_vec();
     reversed.reverse();
@@ -276,6 +280,7 @@ where
 #[cfg(test)]
 mod reverse_tests {
     use super::reverse;
+    use num_complex::Complex;
 
     #[test]
     fn test_reverse_int() {
@@ -287,6 +292,23 @@ mod reverse_tests {
     fn test_reverse_float() {
         let result = reverse(&[1.5, 2.5, 3.5]);
         assert_eq!(result, vec![3.5, 2.5, 1.5]);
+    }
+
+    #[test]
+    fn test_reverse_complex() {
+        let result = reverse(&[
+            Complex::new(1.0, 2.0),
+            Complex::new(3.0, 4.0),
+            Complex::new(5.0, 6.0),
+        ]);
+        assert_eq!(
+            result,
+            vec![
+                Complex::new(5.0, 6.0),
+                Complex::new(3.0, 4.0),
+                Complex::new(1.0, 2.0)
+            ]
+        );
     }
 
     #[test]
