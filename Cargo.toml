@@ -2,5 +2,9 @@
 name = "rusp"
 version = "0.1.0"
 edition = "2021"
+description = "Rust Signal Processing Library"
+repository = "https://github.com/h4ck3r-04/rusp"
+authors = ["Rudraditya Thakur"]
 
 [dependencies]
+num-traits = "0.2.19"
