@@ -373,7 +373,7 @@ where
 }
 
 #[cfg(test)]
-mod tests {
+mod concatenate_tests {
     use super::concatenate;
     use num_complex::Complex;
 
